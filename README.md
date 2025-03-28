@@ -19,7 +19,7 @@ The **CV Practice Competition** aims to:
 Here are some of the recommended projects for the competition:
 - **Pneumonia X-ray Classification**: Classify chest X-ray images to detect pneumonia.
 - **Street View Road Segmentation**: Perform semantic segmentation to identify drivable areas in street view images.
-- **Plant Disease Detection**: Detect diseases in plant leaves through image classification or object detection.
+- **Plant Disease Recognition**: Detect diseases in plant leaves through image classification.
 - **Satellite Building Segmentation**: Segment buildings from satellite images for urban planning.
 - **Retail Shelf Detection**: Detect products on retail shelves for inventory management.
 - **Retinal Vessel Segmentation**: Segment blood vessels from retinal images for medical diagnosis.
