@@ -1,8 +1,11 @@
 import numpy as np
-from torch.utils.data import Dataset,DataLoader
+from torch.utils.data import Dataset, DataLoader
 import os
 import cv2
 from PIL import Image
+
+def resize_image(image, size=(572, 572)):
+    return cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
 
 class TestDataset(Dataset):
     def __init__(self, data_path):
@@ -18,8 +21,9 @@ class TestDataset(Dataset):
         mask_file = os.path.join(self.mask_paths, self.file_list[idx].replace('.tif', '_mask.gif'))
         image = cv2.imread(image_file)
         mask = np.array(Image.open(mask_file).convert("L"))
+        image = resize_image(image)
+        mask = resize_image(mask)
         return image * np.expand_dims(mask > 0, axis=-1)
-
 
 class TrainingDataset(Dataset):
     def __init__(self, data_path):
@@ -37,10 +41,12 @@ class TrainingDataset(Dataset):
         mask_file = os.path.join(self.mask_paths, f'{base_name}_mask.gif')
         manual_file = os.path.join(self.manual, f'{base_name.strip('_training')}_manual1.gif')
         image = cv2.imread(image_file)
-        manual = np.array(Image.open(manual_file).convert("RGB"))
+        manual = np.array(Image.open(manual_file).convert("L"))
         mask = np.array(Image.open(mask_file).convert("L"))
+        image = resize_image(image)
+        manual = resize_image(manual)
+        mask = resize_image(mask)
         return image * np.expand_dims(mask > 0, axis=-1), manual * np.expand_dims(mask > 0, axis=-1)
-
 
 if __name__ == "__main__":
     train_dataset = TrainingDataset(r'Retinal_Vessel_Segmentation\202410311023_RegtLu\data_example\training')
