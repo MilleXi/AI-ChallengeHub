@@ -49,18 +49,24 @@ if __name__ == "__main__":
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
     for batch_idx, train_data in enumerate(train_loader):
         image1,image2 = train_data
-        image1=image1.squeeze()
-        image2=image2.squeeze()
-        cv2.imshow('Image', image1.numpy().astype(np.uint8))
+        image1=image1.squeeze().numpy().astype(np.uint8)
+        image2=image2.squeeze().numpy().astype(np.uint8)
+        image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        mean = np.mean(image1)
+        image1 = image1 - mean
+        image1 =np.clip(image1, 0, 255)
+        image1 = image1.astype(np.uint8)
+        image1=cv2.Canny(image1, 25, 50,apertureSize=3,L2gradient=True)
+        cv2.imshow('Image', image1)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        cv2.imshow('Image', image2.numpy().astype(np.uint8))
+        cv2.imshow('Image', image2)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         break
     for batch_idx, test_data in enumerate(test_loader):
-        image=test_data.squeeze()
-        cv2.imshow('Image', image.numpy().astype(np.uint8))
+        image=test_data.squeeze().numpy().astype(np.uint8)
+        cv2.imshow('Image', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         break

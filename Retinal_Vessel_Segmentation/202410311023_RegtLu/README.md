@@ -8,3 +8,4 @@ https://drive.grand-challenge.org/
 ```torch 2.6.0 (cuda 12.6)```
 # Progress
 * 3.29 dataset utils.py
+* 3.29 尝试通过边缘检测进行预处理，发现部分细小血管无法检测到
