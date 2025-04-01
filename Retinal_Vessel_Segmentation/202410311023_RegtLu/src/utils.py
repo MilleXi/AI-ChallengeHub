@@ -31,10 +31,10 @@ class TrainingDataset(Dataset):
         self.file_list = sorted([f for f in os.listdir(self.image_paths) if f.endswith('.tif')])
 
     def __len__(self):
-        return len(self.file_list)*4
+        return len(self.file_list)
 
     def __getitem__(self, idx):
-        base_name = self.file_list[idx//4].replace('.tif', '')
+        base_name = self.file_list[idx].replace('.tif', '')
         image_file = os.path.join(self.image_paths, f'{base_name}.tif')
         mask_file = os.path.join(self.mask_paths, f'{base_name}_mask.gif')
         manual_file = os.path.join(self.manual, f'{base_name.strip('_training')}_manual1.gif')

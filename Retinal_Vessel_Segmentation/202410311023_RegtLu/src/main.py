@@ -1,3 +1,4 @@
+import cv2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,7 +10,7 @@ import utils
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-model = unet.UNet(1,1)
+model = unet.UNet(1,1).to(device)
 loss_func = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
@@ -17,10 +18,10 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 train_data = utils.TrainingDataset(r'Retinal_Vessel_Segmentation\202410311023_RegtLu\data_example\training')
 train_loader = torch.utils.data.DataLoader(train_data, batch_size=1, shuffle=False)
 
-for i in range(5):
+for i in range(1):
     for batch_idx, data in enumerate(train_loader):
-        image = data[0].to('cpu')
-        target = data[1].to('cpu')
+        image = data[0].to(device)
+        target = data[1].to(device)
         mask = data[2].squeeze().numpy().astype(np.float32)
         image_1 = image[:, :, :292, :292]  # 左上
         image_2 = image[:, :, :292, 292:]  # 右上
@@ -38,10 +39,19 @@ for i in range(5):
         predict[:, :, 292:584, 273:565] = predict_4
         predict[:, :, 0:292, 273:292] = (predict_1[:, :, 0:292, 273:292] + predict_2[:, :, 0:292, 0:19]) / 2
         predict[:, :, 292:584, 273:292] = (predict_3[:, :, 0:292, 273:292] + predict_4[:, :, 0:292, 0:19]) / 2
-        predict = predict.to('cpu') 
-        predict * torch.tensor(mask > 0, dtype=torch.float32, device='cpu')
+        predict * torch.tensor(mask > 0, dtype=torch.float32, device=device)
         loss = loss_func(predict, target)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         print(f"Batch {batch_idx}: Loss = {loss.item()}")
+    
+    temp = predict.detach().cpu().squeeze().numpy().astype(np.float32)
+    temp = temp * (temp>0.5)
+    cv2.imshow('Image', temp)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    temp = target.detach().cpu().squeeze().numpy().astype(np.float32)
+    cv2.imshow('Image', temp)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
