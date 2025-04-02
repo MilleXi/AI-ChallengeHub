@@ -22,12 +22,12 @@ class TestDataset(Dataset):
         base_name = self.file_list[idx].replace(".tif", "")
         image_file = os.path.join(self.image_paths, f"{base_name}.tif")
         mask_file = os.path.join(self.mask_paths, f"{base_name}_mask.gif")
-        image = TF.to_tensor(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE))
+        image_origin = TF.to_tensor(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE))
         mask = TF.to_tensor(Image.open(mask_file).convert("L"))
         padding = (11, 12, 2, 2)
-        image = nn.ZeroPad2d(padding)(image)
+        image = nn.ZeroPad2d(padding)(image_origin)
         mask_padding = nn.ZeroPad2d(padding)(mask)
-        return image * (mask_padding > 0), mask
+        return image * (mask_padding > 0), mask, image_origin
 
 
 class TrainingDataset(Dataset):

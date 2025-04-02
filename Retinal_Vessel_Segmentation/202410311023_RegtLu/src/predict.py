@@ -16,9 +16,11 @@ with torch.no_grad():
     for batch_idx, data in enumerate(test_loader):
         image = data[0].to(device)
         mask = data[1].squeeze().numpy().astype(np.float32)
+        image_origin = data[2][0][0]
         predict = model(image)[:, :, 2:-2, 11:-12]
         predict * torch.tensor(mask > 0, dtype=torch.float32, device=device)
         temp = predict.detach().cpu().squeeze().numpy().astype(np.float32)
+        temp = np.concatenate((temp,image_origin), axis=1)
         cv2.imshow("Image", temp)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

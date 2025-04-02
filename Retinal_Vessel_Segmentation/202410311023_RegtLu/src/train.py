@@ -30,7 +30,7 @@ def train():
         optimizer.step()
     print(f"Best Loss = {best_loss}")
 
-for i in range(10):
+for i in range(20):
     train()
 
 torch.save(model, os.path.join(os.path.dirname(__file__), "model.pth"))
