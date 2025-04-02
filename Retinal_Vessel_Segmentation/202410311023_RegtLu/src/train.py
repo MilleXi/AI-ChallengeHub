@@ -7,8 +7,8 @@ import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = unet.UNet(1, 1).to(device)
-loss_func = nn.BCEWithLogitsLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+loss_func = unet.DiceBCELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 train_data = utils.TrainingDataset(
     r"Retinal_Vessel_Segmentation\202410311023_RegtLu\data_example\training"
 )
@@ -30,7 +30,7 @@ def train():
         optimizer.step()
     print(f"Best Loss = {best_loss}")
 
-for i in range(20):
+for i in range(50):
     train()
 
 torch.save(model, os.path.join(os.path.dirname(__file__), "model.pth"))

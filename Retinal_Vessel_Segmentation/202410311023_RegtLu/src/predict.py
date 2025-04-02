@@ -21,7 +21,7 @@ with torch.no_grad():
         predict * torch.tensor(mask > 0, dtype=torch.float32, device=device)
         temp = predict.detach().cpu().squeeze().numpy().astype(np.float32)
         temp = np.concatenate((temp,image_origin), axis=1)
-        cv2.imshow("Image", temp)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        break
+        filename = f'test{batch_idx+1}.png'
+        filepath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'result', filename)
+        temp = temp * 255
+        cv2.imwrite(filepath, temp)
