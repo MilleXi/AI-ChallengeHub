@@ -72,22 +72,28 @@ class UNet(nn.Module):
         x = self.l4_(x, x3)
         x = self.l3_(x, x2)
         x = self.l2_(x, x1)
-        logits = self.out(x)
-        return logits
-
+        x = self.out(x)
+        return x
 
 class DiceBCELoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceBCELoss, self).__init__()
 
-    def forward(self, inputs, targets, smooth=1):
-
-        #comment out if your model contains a sigmoid or equivalent activation layer
+    def forward(self, inputs, targets, mask = None):
+        smooth=1
         inputs = torch.sigmoid(inputs)
 
-        #flatten label and prediction tensors
+        if mask is not None:
+            mask = mask
+        else:
+            mask = torch.ones_like(inputs)
+
         inputs = inputs.view(-1)
         targets = targets.view(-1)
+        mask = mask.view(-1)
+
+        inputs = inputs * mask
+        targets = targets * mask
 
         intersection = (inputs * targets).sum()
         dice_loss = 1 - (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)

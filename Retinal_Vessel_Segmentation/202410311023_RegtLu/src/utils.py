@@ -1,4 +1,6 @@
+import math
 import numpy as np
+import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms.functional as TF
@@ -23,11 +25,16 @@ class TestDataset(Dataset):
         image_file = os.path.join(self.image_paths, f"{base_name}.tif")
         mask_file = os.path.join(self.mask_paths, f"{base_name}_mask.gif")
         image_origin = TF.to_tensor(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE))
+        image_color = cv2.imread(image_file)
         mask = TF.to_tensor(Image.open(mask_file).convert("L"))
         padding = (11, 12, 2, 2)
         image = nn.ZeroPad2d(padding)(image_origin)
         mask_padding = nn.ZeroPad2d(padding)(mask)
-        return image * (mask_padding > 0), mask, image_origin
+        new_image = cv2.equalizeHist(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE) * (mask.squeeze().numpy() > 0))
+        new_image = torch.tensor(new_image).unsqueeze(0) / 255.0
+        new_image = nn.ZeroPad2d(padding)(new_image)
+        image = (image + new_image) / 2
+        return image * (mask_padding > 0), mask, image_origin, image_color
 
 
 class TrainingDataset(Dataset):
@@ -55,6 +62,10 @@ class TrainingDataset(Dataset):
         padding = (11, 12, 2, 2)
         image = nn.ZeroPad2d(padding)(image)
         mask_padding = nn.ZeroPad2d(padding)(mask)
+        new_image = cv2.equalizeHist(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE) * (mask.squeeze().numpy() > 0))
+        new_image = torch.tensor(new_image).unsqueeze(0) / 255.0
+        new_image = nn.ZeroPad2d(padding)(new_image)
+        image = (image + new_image) / 2
         return image * (mask_padding > 0), manual * (mask > 0), mask
 
 
@@ -68,7 +79,7 @@ if __name__ == "__main__":
     )
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
     for batch_idx, train_data in enumerate(train_loader):
-        image1, image2, image3 = train_data
+        image1, image2, image3= train_data
         image1 = image1.squeeze().numpy().astype(np.float32)
         image2 = image2.squeeze().numpy().astype(np.float32)
         image3 = image3.squeeze().numpy().astype(np.float32)
@@ -81,11 +92,23 @@ if __name__ == "__main__":
         cv2.imshow("Image", image3)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        break
     exit()
     for batch_idx, test_data in enumerate(test_loader):
-        image = test_data.squeeze().numpy().astype(np.uint8)
-        cv2.imshow("Image", image)
+        image1, image2, image3, image4 = test_data
+        image1 = image1.squeeze().numpy().astype(np.float32)
+        image2 = image2.squeeze().numpy().astype(np.float32)
+        image3 = image3.squeeze().numpy().astype(np.float32)
+        image4 = image4.squeeze().numpy()
+        cv2.imshow("Image", image1)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        cv2.imshow("Image", image2)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        cv2.imshow("Image", image3)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        cv2.imshow("Image", image4)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         break
