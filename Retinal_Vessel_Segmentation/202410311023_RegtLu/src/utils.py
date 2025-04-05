@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import torch
 import torch.nn as nn
@@ -33,7 +32,7 @@ class TestDataset(Dataset):
         new_image = cv2.equalizeHist(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE) * (mask.squeeze().numpy() > 0))
         new_image = torch.tensor(new_image).unsqueeze(0) / 255.0
         new_image = nn.ZeroPad2d(padding)(new_image)
-        image = (image + new_image) / 2
+        image = (image*2 + new_image) / 3
         return image * (mask_padding > 0), mask, image_origin, image_color
 
 
@@ -65,7 +64,7 @@ class TrainingDataset(Dataset):
         new_image = cv2.equalizeHist(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE) * (mask.squeeze().numpy() > 0))
         new_image = torch.tensor(new_image).unsqueeze(0) / 255.0
         new_image = nn.ZeroPad2d(padding)(new_image)
-        image = (image + new_image) / 2
+        image = (image*2 + new_image) / 3
         return image * (mask_padding > 0), manual * (mask > 0), mask
 
 
