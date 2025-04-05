@@ -46,26 +46,41 @@ class TrainingDataset(Dataset):
         )
 
     def __len__(self):
-        return len(self.file_list)
+        return len(self.file_list)*2
 
     def __getitem__(self, idx):
+        flip = False
+        if idx%2==1:
+            flip=True
+        idx = idx // 2
         base_name = self.file_list[idx].replace(".tif", "")
         image_file = os.path.join(self.image_paths, f"{base_name}.tif")
         mask_file = os.path.join(self.mask_paths, f"{base_name}_mask.gif")
         manual_file = os.path.join(
             self.manual, f"{base_name.strip('_training')}_manual1.gif"
         )
-        image = TF.to_tensor(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE))
+        image_origin = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)
+        image = TF.to_tensor(image_origin)
         manual = TF.to_tensor(Image.open(manual_file).convert("L"))
         mask = TF.to_tensor(Image.open(mask_file).convert("L"))
-        padding = (11, 12, 2, 2)
+        if flip:
+            padding = (12, 11, 2, 2)
+        else:
+            padding = (11, 12, 2, 2)
         image = nn.ZeroPad2d(padding)(image)
         mask_padding = nn.ZeroPad2d(padding)(mask)
-        new_image = cv2.equalizeHist(cv2.imread(image_file, cv2.IMREAD_GRAYSCALE) * (mask.squeeze().numpy() > 0))
+        image = image * (mask_padding > 0)
+        manual = manual * (mask > 0)
+        new_image = cv2.equalizeHist(image_origin * (mask.squeeze().numpy() > 0))
         new_image = torch.tensor(new_image).unsqueeze(0) / 255.0
         new_image = nn.ZeroPad2d(padding)(new_image)
+        if flip:
+            image = torch.flip(image, [2])
+            mask = torch.flip(mask, [2])
+            manual = torch.flip(manual, [2])
+            new_image = torch.flip(new_image, [2])            
         image = (image*2 + new_image) / 3
-        return image * (mask_padding > 0), manual * (mask > 0), mask
+        return image, manual, mask
 
 
 if __name__ == "__main__":
