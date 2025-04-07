@@ -13,3 +13,4 @@ https://drive.grand-challenge.org/
 * 4.2 可以较准确预测，但是边缘和中心亮点会被误识别
 * 4.2 修改loss计算方法和optimizer,但是细小血管在预测结果中变得不连续
 * 4.2 改用 [DiceBCELoss](https://github.com/MilleXi/Retinal-vessel-segmentation/blob/main/loss.py) 作为Loss计算
+* 4.5 将unet移至models.py,更新彩色结果图,在loss计算中应用mask,对图片进行直方图均衡化预处理以加强对细小血管的检测,翻转图片以增加训练样本

@@ -16,12 +16,11 @@ with torch.no_grad():
     for batch_idx, data in enumerate(test_loader):
         image = data[0].to(device)
         mask = data[1].squeeze().numpy().astype(np.float32)
-        image_origin = data[2][0][0]
+        image_origin = data[3].squeeze().numpy()
         predict = model(image)[:, :, 2:-2, 11:-12]
-        predict * torch.tensor(mask > 0, dtype=torch.float32, device=device)
         temp = predict.detach().cpu().squeeze().numpy().astype(np.float32)
-        temp = np.concatenate((temp,image_origin), axis=1)
+        temp = temp * mask
+        temp = np.concatenate((np.stack([temp]*3, axis=-1)* 255,image_origin), axis=1)
         filename = f'test{batch_idx+1}.png'
         filepath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'result', filename)
-        temp = temp * 255
         cv2.imwrite(filepath, temp)
