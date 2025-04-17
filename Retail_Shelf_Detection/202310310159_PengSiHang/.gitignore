@@ -21,11 +21,8 @@ var/
 *.egg
 
 # 数据集目录（保留data目录结构）
-data/*
+data/SKU110K
 !data/.gitkeep
-
-# 但不忽略特定的测试目录
-!data/test/
 
 # 显式忽略数据集目录
 data/SKU110K/

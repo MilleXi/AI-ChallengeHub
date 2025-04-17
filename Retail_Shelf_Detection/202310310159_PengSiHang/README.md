@@ -1,125 +1,129 @@
-# 零售货架目标检测项目
+# 零售货架商品检测项目
 
-本项目旨在实现零售货架上商品的自动检测与识别，使用 YOLOv8 模型在 SKU110K 数据集上进行训练和评估。该项目解决了密集小目标检测的挑战，可应用于零售商品自动盘点和陈列分析等场景。
+基于 YOLOv8 模型的零售货架商品密集目标检测系统，使用 SKU110K 数据集训练。
+
+## 项目背景
+
+零售货架商品检测是零售行业中的一个重要应用场景，可用于自动化商品盘点、陈列分析和库存管理。本项目旨在构建一个高效的商品检测系统，能够在复杂的零售环境中准确识别密集排列的商品。
+
+## 数据集介绍
+
+SKU110K 数据集包含 11,762 张零售货架图片，标注了商品的边界框位置。该数据集主要特点：
+
+- 密集小目标：商品在货架上密集排列，且相对图像尺寸较小
+- 高度相似：许多商品外观相似，增加了检测难度
+- 真实场景：图像来自真实零售环境，包含各种光照和视角变化
+
+数据集分为三个子集：
+
+- 训练集：8,219 张图像
+- 验证集：588 张图像
+- 测试集：2,936 张图像
+
+## 模型选择
+
+本项目使用 YOLOv8n（Nano 版）作为目标检测模型，该模型具有以下优势：
+
+- 轻量级设计，适合低算力设备部署
+- 高检测精度和实时性能的平衡
+- 对小目标检测有较好的支持
 
 ## 项目结构
 
 ```
-retail_shelf/
-├── config/                    # 配置文件目录
-│   └── sku110k.yaml           # SKU110K数据集和模型配置
-├── data/                      # 数据集目录
-│   └── SKU110K/               # SKU110K数据集
-├── models/                    # 模型保存目录
-├── results/                   # 结果保存目录
-├── scripts/                   # 脚本目录
-│   ├── download_data.py       # 数据下载脚本
-│   ├── prepare_data.py        # 数据预处理脚本
-│   ├── train.py               # 训练脚本
-│   ├── val.py                 # 验证脚本
-│   └── test.py                # 测试脚本
-├── utils/                     # 工具函数目录
-│   ├── general.py             # 通用工具函数
-│   ├── logger.py              # 日志模块
-│   └── plots.py               # 绘图工具
-└── main.py                    # 主程序入口
+├── code/                   # 代码目录
+│   ├── main.py             # 主入口脚本
+│   ├── train.py            # 模型训练脚本
+│   ├── evaluate.py         # 模型评估脚本
+│   ├── predict.py          # 预测脚本
+│   └── yolotest.py         # 测试脚本
+├── data/                   # 数据目录
+│   └── SKU110K/            # SKU110K数据集
+│       ├── images/         # 图像文件
+│       ├── annotations/    # 原始标注
+│       └── yolo_format/    # YOLO格式标注
+├── yolov8n.pt              # YOLOv8n预训练模型
+└── README.md               # 项目说明文档
 ```
 
-## 环境设置
-
-本项目需要以下依赖：
-
-- Python 3.8+
-- PyTorch
-- OpenCV
-- Ultralytics YOLOv8
-- NumPy
-- Matplotlib
-- Pandas
-
-可以使用 conda 创建环境并安装依赖：
+## 安装依赖
 
 ```bash
-# 创建conda环境
-conda create -n retail_shelf python=3.8 -y
-
-# 激活环境
-conda activate retail_shelf
-
-# 安装依赖
-pip install numpy opencv-python matplotlib torch torchvision ultralytics
+pip install ultralytics opencv-python matplotlib numpy
 ```
 
-## 数据集
+## 使用方法
 
-本项目使用 SKU110K 数据集，该数据集包含 11,762 张零售货架图片，标注了商品的边界框。对于本项目，我们选取含饮料/零食的子集进行处理。
-
-### 数据集获取
-
-可以使用提供的下载脚本获取数据集：
+### 训练模型
 
 ```bash
-python scripts/download_data.py
+cd code
+python main.py train
 ```
 
-### 数据集预处理
+### 评估模型
 
-下载后，需要将数据集转换为 YOLO 格式：
+评估模型性能：
 
 ```bash
-python scripts/prepare_data.py
+python main.py eval
 ```
 
-## 模型训练
-
-使用以下命令开始训练：
+评估并可视化结果：
 
 ```bash
-python main.py --mode train --weights yolov8n.pt --epochs 100 --batch-size 16 --img-size 640
+python main.py eval --viz --samples 10
 ```
 
-训练参数说明：
+### 预测
 
-- `--weights`: 预训练模型路径，默认为 yolov8n.pt（nano 版本适合低算力环境）
-- `--epochs`: 训练轮数
-- `--batch-size`: 批量大小
-- `--img-size`: 输入图像尺寸
-- `--device`: CUDA 设备选择，如'0'或'0,1'等
-
-## 模型评估
+使用摄像头进行实时预测：
 
 ```bash
-python main.py --mode val --weights ./results/train/weights/best.pt
+python main.py predict
 ```
 
-## 模型测试与推理
-
-在测试图像上进行推理：
+使用图像进行预测：
 
 ```bash
-python main.py --mode test --weights ./results/train/weights/best.pt --source ./data/test_images
+python main.py predict --source /path/to/image.jpg --save
 ```
 
-## 小目标检测优化
+使用视频进行预测：
 
-为了优化密集小目标检测效果，本项目采用了以下策略：
+```bash
+python main.py predict --source /path/to/video.mp4 --save
+```
 
-1. 输入分辨率设置为 640x640
-2. 使用多尺度训练（0.5x-1.5x 缩放）
-3. 优化 Anchor Box 尺寸以适应小目标
-4. 使用 Focal Loss 解决类别不平衡问题
-5. 改进 NMS（非极大值抑制）算法以处理密集目标
+### 参数说明
 
-## 结果展示
+训练相关参数在`train.py`中设置：
 
-训练过程和检测效果将保存在`results`目录下，包括：
+- `epochs`: 训练轮数
+- `imgsz`: 输入图像大小
+- `batch`: 批次大小
+- 等其他超参数
 
-- 训练日志和指标曲线
-- 验证集上的评估结果
-- 测试图像的检测结果
+预测相关参数：
 
-## 参考资源
+- `--source`: 输入源（图像、视频或摄像头）
+- `--model`: 模型路径
+- `--conf`: 置信度阈值
+- `--iou`: NMS IOU 阈值
+- `--save`: 是否保存结果
+- `--device`: 设备选择
 
-1. SKU110K 数据集: [github.com/eg4000/SKU110K_CVPR19](https://github.com/eg4000/SKU110K_CVPR19)
-2. YOLOv8: [ultralytics.com/yolov8](https://docs.ultralytics.com/)
-3. 论文: "SKU-110K: Precise Detection of Objects in Dense Scenes" - Goldman et al. CVPR 2019
+## 模型优化
+
+针对 SKU110K 数据集中的密集小目标检测问题，本项目采用了以下优化策略：
+
+- 多尺度训练 (0.5x-1.5x 缩放)
+- 输入分辨率设置为 640x640
+- 使用 Focal Loss 关注难分类样本
+- 优化 NMS 处理密集目标
+
+## 参考资料
+
+1. [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics)
+2. [SKU110K 数据集](https://github.com/eg4000/SKU110K_CVPR19)
+3. [YOLO 论文](https://arxiv.org/abs/2207.02696)

@@ -1,0 +1,1 @@
+The CSV columns are: image_name,x1,y1,x2,y2,class,image_width,image_height
