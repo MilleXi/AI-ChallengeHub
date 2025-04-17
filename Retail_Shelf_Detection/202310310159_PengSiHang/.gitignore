@@ -37,13 +37,12 @@ data/SKU110K_fixed.tar.gz
 *.weights
 *.onnx
 
+runs/
+
 # 日志文件
 *.log
 logs/
 
-# 运行时生成的文件
-runs/
-results/
 
 # 编辑器相关
 .vscode/
