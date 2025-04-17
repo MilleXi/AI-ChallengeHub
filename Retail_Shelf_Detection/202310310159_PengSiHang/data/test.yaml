@@ -1,0 +1,12 @@
+
+# 训练数据路径（YOLOv8要求必须有该字段）
+train: E:\code\works\AI-ChallengeHub\Retail_Shelf_Detection\202310310159_PengSiHang\data\SKU110K\images\test
+# 验证数据路径（YOLOv8要求必须有该字段）
+val: E:\code\works\AI-ChallengeHub\Retail_Shelf_Detection\202310310159_PengSiHang\data\SKU110K\images\test
+# 测试数据路径
+test: E:\code\works\AI-ChallengeHub\Retail_Shelf_Detection\202310310159_PengSiHang\data\SKU110K\images\test
+
+# 类别数量（商品检测只有一个类别）
+nc: 1
+# 类别名称
+names: ['item']

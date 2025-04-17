@@ -1,0 +1,56 @@
+# Python相关
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 数据集目录（保留data目录结构）
+data/SKU110K
+!data/.gitkeep
+
+# 显式忽略数据集目录
+data/SKU110K/
+data/SKU110K_fixed.tar.gz
+
+# 保留yolo格式数据目录（如果需要）
+!data/SKU110K/yolo_format/.gitkeep
+
+# 模型权重文件
+*.pt
+*.pth
+*.weights
+*.onnx
+
+runs/
+
+# 日志文件
+*.log
+logs/
+
+
+# 编辑器相关
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统相关
+.DS_Store
+Thumbs.db 

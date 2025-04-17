@@ -1,0 +1,10 @@
+ultralytics>=8.0.0
+opencv-python>=4.5.0
+matplotlib>=3.5.0
+numpy>=1.20.0
+torch>=1.7.0
+torchvision>=0.8.0
+pillow>=8.0.0
+pyyaml>=5.4.0
+tqdm>=4.60.0
+tensorboard>=2.4.0 
