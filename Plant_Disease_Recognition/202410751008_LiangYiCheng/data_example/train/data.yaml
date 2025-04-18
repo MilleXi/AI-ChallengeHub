@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['diseased', 'healthy']
+
+roboflow:
+  workspace: wsdlly02-babv8
+  project: jsjds2025
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/wsdlly02-babv8/jsjds2025/dataset/3
